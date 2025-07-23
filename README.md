@@ -44,3 +44,24 @@ The intent of this project is to create a simple HTTP Server written in GO
   - Client cookies, allowing clients to store state on the client side
   - New status codes
   - Etc
+
+## HTTP/2 (2015)
+
+- Binary protocol, instead of text
+  - Major building blocks are Frames and Sreams:
+    - HTTP messages are split into frames (ie. headers, data, etc.)
+    - Frames are binary pieces of data.
+    - Streams are a sequence of frames that form a complete HTTP message
+    - Each request and response has a unique identifier (stream ID) - divided into frames
+    - Each frame has a stream ID, that identifies the stream it belongs to
+    - Requests from client uses odd numbers, responses from server uses even numbers
+    - RST_STREAM is a special frame type that is used to abort a stream. I.e. the client letting the server know it doesn't need the stream anymore (notice that this won't stop the connection, just the stream. The client can still receive other streams on the same connection)
+- Designed for low latency of content transfer
+- Multiplexing - Allows multiple requests to be sent on the same connection without waiting for the response of the previous request, similar to HTTP/1.1 pipelining, but more efficient
+- Header compression - Reduces the size of the headers sent in the requests and responses
+  - Huffman code is used to compress the headers
+  - Server and client maintain a table of headers, allowing them to omit repetitive headers in subsequent requests and responses
+- Server push - Multiple responses can be sent for a single request, allowing the server to push resources to the client before the client requests them (For exemple, the server can push the CSS and JS files needed for a page before the client requests them)
+  - The server sends a PUSH_PROMISE frame to the client, indicating that it will send a response for a specific request and that the client doesn't need to request it
+- Request prioritization - Allows the client to specify the priority of the requests, allowing the server to prioritize the responses
+- Security
