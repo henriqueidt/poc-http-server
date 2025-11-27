@@ -7,38 +7,56 @@ import (
 	"strings"
 )
 
+func readLines(f io.ReadCloser) <-chan string {
+	lines := make(chan string)
+
+	go func() {
+		defer f.Close()
+		defer close(lines)
+		
+		line := ""
+		for {
+			b1 := make([]byte, 8)
+			n1, err := f.Read(b1)
+			if(err != nil) {
+				if line != "" {
+					lines <- line
+				}
+				if(err == io.EOF) {
+					break
+				}
+				panic(err)
+			}
+			
+			currContent := string(b1[:n1])
+			parts := strings.Split(currContent, "\n")
+			
+			for i := 0; i < len(parts)-1; i++ {
+			lines <- fmt.Sprintf("%s%s", line, parts[i])
+			line = ""
+		}
+		
+		line += parts[len(parts)-1]
+		
+		}
+	}()
+
+	return lines;
+}
+
 func main() {
 	f, err := os.Open("./messages.txt")
 	if(err != nil) {
 		panic(err)
 	}
 
-	line := ""
-	for {
-		b1 := make([]byte, 8)
-		n1, err := f.Read(b1)
-		if(err != nil) {
-			if line != "" {
-				fmt.Printf("read: %s\n", line)
-				line = ""
-			}
-			if(err == io.EOF) {
-				break
-			}
-			panic(err)
-		}
+	lines := readLines(f)
 
-		currContent := string(b1[:n1])
-		parts := strings.Split(currContent, "\n")
-
-		for i := 0; i < len(parts)-1; i++ {
-			fmt.Printf("read: %s%s\n", line, parts[i])
-			line = ""
-		}
-
-		line += parts[len(parts)-1]
-
+	for line := range lines {
+		fmt.Println("read:", line)
 	}
+
+	
 
 	// net.Dial interface is used to connect to the server
 	// It returns a net.Conn interface which can be used to read and write data to the connection
