@@ -80,3 +80,37 @@ The intent of this project is to create a simple HTTP Server written in GO
 - TCP makes use of sliding windows, that will tell how many packages can be in flight at one time
   - Everytime one package is completely sent, the receiver will send an `ack` to the sender. The sender then can use that information to move the sliding window further
 - TCP makes use of handshakes, to acknowledge that the receiver has estabilished the connection before sending data, while UDP just sends the data expecting receiver to receive it, that's why it is much faster
+
+## HTTP?
+
+- TCP doesn't tell what type of data exactly is being transfered, that's why we need HTTP
+
+### HTTP Message Structure
+
+```bash
+METHOD /path PROTOCOL-VERSION\r\n
+field: value\r\n (header)
+field: value\r\n (header)
+\r\n (end of headers)
+{
+  body content
+}
+```
+
+- **METHOD:** The HTTP method of the request (POST, GET, DELETE, PATCH)
+- **/path:** The path of the resource
+- **PROTOCOL-VERSION:** The version of the protocol (HTTP/1.1, HTTP/2, etc)
+- **\r\n:** End of line indicator (last one is end of headers indicator)
+- **field: value:** HTTP Headers
+
+Example:
+
+```bash
+GET /posts HTTP/1.1\r\n
+Host: posts-example.com\r\n
+User-Agent: Mozilla/5.0\r\n
+Accept: application/json\r\n
+Content-Length: 126\r\n
+\r\n
+
+```
