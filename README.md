@@ -65,3 +65,18 @@ The intent of this project is to create a simple HTTP Server written in GO
   - The server sends a PUSH_PROMISE frame to the client, indicating that it will send a response for a specific request and that the client doesn't need to request it
 - Request prioritization - Allows the client to specify the priority of the requests, allowing the server to prioritize the responses
 - Security
+
+## Why HTTP uses TCP (Transmission Control Protocol)
+
+- TCP is reliable that data is going to be sent in order
+- TCP compared to UDP (User Datagram Protocol):
+  | | TCP | UDP |
+  |----------------|-----|-----|
+  | Connection | Yes | No |
+  | Handshake | Yes | No |
+  | In Order | Yes | No |
+  | Fast | No | Yes |
+
+- TCP makes use of sliding windows, that will tell how many packages can be in flight at one time
+  - Everytime one package is completely sent, the receiver will send an `ack` to the sender. The sender then can use that information to move the sliding window further
+- TCP makes use of handshakes, to acknowledge that the receiver has estabilished the connection before sending data, while UDP just sends the data expecting receiver to receive it, that's why it is much faster
